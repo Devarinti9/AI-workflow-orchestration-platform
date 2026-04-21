@@ -45,6 +45,4 @@ docker compose up --build
 - `POST /ingest?limit=5`
 - `GET /records`
 - `POST /orchestrate`
-
-## Resume Description
-Engineered an AI-driven workflow orchestration platform to automate external data ingestion, backend processing, and structured data storage, improving workflow efficiency and reducing manual intervention across cloud-based environments.
+efficiency and reducing manual intervention across cloud-based environments.
