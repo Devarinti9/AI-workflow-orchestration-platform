@@ -1,16 +1,14 @@
-from sqlalchemy import DateTime, Integer, String, func
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped, mapped_column
-from app.db import Base
-
+from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy.sql import func
+from app.services.db import Base
 
 class WorkflowRecord(Base):
     __tablename__ = "workflow_records"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    source_name: Mapped[str] = mapped_column(String(100), index=True)
-    title: Mapped[str] = mapped_column(String(255))
-    raw_payload: Mapped[dict] = mapped_column(JSONB)
-    processed_output: Mapped[dict] = mapped_column(JSONB)
-    status: Mapped[str] = mapped_column(String(50), default="processed")
-    created_at: Mapped[str] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    id = Column(Integer, primary_key=True, index=True)
+    source_name = Column(String(100), nullable=False)
+    title = Column(String(255), nullable=True)
+    raw_payload = Column(Text, nullable=False)
+    processed_output = Column(Text, nullable=True)
+    status = Column(String(50), default="stored")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
