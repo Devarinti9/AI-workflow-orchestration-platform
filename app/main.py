@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+
 from app.api.routes import router
+from app.models.workflow import WorkflowRecord  # noqa: F401
 from app.services.db import Base, engine
-from app.models.workflow import WorkflowRecord
 
 Base.metadata.create_all(bind=engine)
 

@@ -1,48 +1,53 @@
 # AI Workflow Orchestration Platform
 
-A FastAPI-based backend platform that automates external data ingestion, scheduled workflows, AI-driven orchestration, and structured storage.
+## Overview
+AI-driven workflow orchestration platform for automated external data ingestion, backend processing, intelligent workflow execution, and structured data storage.
 
 ## Tech Stack
-- Python
-- FastAPI
-- Airflow
-- LangGraph
-- PostgreSQL
-- Supabase-ready architecture
-- Docker
+Python, FastAPI, LangGraph, SQLAlchemy, SQLite, Docker, Airflow
 
 ## Features
-- External API ingestion
-- Scheduled Airflow DAG
-- AI workflow orchestration using LangGraph
-- Structured PostgreSQL storage
-- Docker-based local setup
+- External API ingestion using Python and Requests
+- FastAPI backend with REST endpoints
+- LangGraph-based workflow orchestration
+- Structured record storage with SQLAlchemy
+- Processed output including summary, word count, and classification
+- Test coverage for key API endpoints
+- Airflow DAG for scheduled ingestion example
 
-## Project Structure
-- `app/` FastAPI application
-- `dags/` Airflow pipelines
-- `tests/` basic tests
+## Workflow
+External API -> Ingestion Service -> LangGraph Workflow -> Database Storage -> API Response
 
-## Run Locally
+## API Endpoints
+- `GET /health` - Health check endpoint
+- `POST /ingest` - Fetches and stores external data with workflow processing
+- `GET /records` - Returns stored records and processed workflow output
+- `POST /orchestrate` - Executes orchestration on the latest stored record
 
-### 1. Clone and enter the project
+## Example Processing
+Each ingested record is processed through a workflow that:
+- generates a short summary
+- calculates word count
+- classifies the record into a category
+
+## Run in Codespaces or local terminal
 ```bash
-git clone <your-repo-url>
-cd ai-workflow-orchestration-platform
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-### 2. Start the stack
+## Run tests
+```bash
+python -m pytest
+```
+
+## Docker
 ```bash
 docker compose up --build
 ```
 
-### 3. Open the services
-- FastAPI docs: `http://localhost:8001/docs`
-- Airflow: `http://localhost:8080`
-
-## Useful Endpoints
-- `GET /health`
-- `POST /ingest?limit=5`
-- `GET /records`
-- `POST /orchestrate`
-efficiency and reducing manual intervention across cloud-based environments.
+## Future Enhancements
+- PostgreSQL integration
+- GCP deployment
+- Authentication and monitoring
+- CI/CD pipeline

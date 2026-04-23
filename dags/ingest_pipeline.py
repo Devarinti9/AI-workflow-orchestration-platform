@@ -1,23 +1,18 @@
 from datetime import datetime
-import requests
+
 from airflow import DAG
-from airflow.operators.python import PythonOperator
-
-
-def call_api():
-    response = requests.post("http://api:8000/ingest?limit=5", timeout=30)
-    response.raise_for_status()
-    return response.json()
-
+from airflow.operators.bash import BashOperator
 
 with DAG(
-    dag_id="external_data_ingestion",
+    dag_id="ai_workflow_ingest_pipeline",
     start_date=datetime(2025, 1, 1),
     schedule="@daily",
     catchup=False,
-    tags=["ingestion", "api", "workflow"],
+    tags=["ai", "workflow", "ingestion"],
 ) as dag:
-    PythonOperator(
-        task_id="trigger_ingestion_api",
-        python_callable=call_api,
+    run_ingestion = BashOperator(
+        task_id="run_ingestion_api",
+        bash_command="curl -X POST http://host.docker.internal:8000/ingest",
     )
+
+    run_ingestion

@@ -1,46 +1,63 @@
 from typing import TypedDict
+
 from langgraph.graph import END, StateGraph
 
 
 class WorkflowState(TypedDict):
     title: str
-    body: str
-    category: str
     summary: str
-
-
-def classify_node(state: WorkflowState) -> WorkflowState:
-    title = state["title"].lower()
-    if "qui" in title or "dolor" in title:
-        category = "high_priority"
-    elif len(title) > 40:
-        category = "review"
-    else:
-        category = "normal"
-
-    state["category"] = category
-    return state
+    word_count: int
+    classification: str
 
 
 def summarize_node(state: WorkflowState) -> WorkflowState:
-    body = state["body"].strip()
-    state["summary"] = body[:120] + ("..." if len(body) > 120 else "")
+    title = state.get("title", "")
+    state["summary"] = title[:100] if title else "No summary available"
     return state
 
 
-def build_summary(title: str, body: str) -> dict:
+def count_words_node(state: WorkflowState) -> WorkflowState:
+    title = state.get("title", "")
+    state["word_count"] = len(title.split()) if title else 0
+    return state
+
+
+def classify_node(state: WorkflowState) -> WorkflowState:
+    title = state.get("title", "").lower()
+
+    if any(word in title for word in ["error", "issue", "fail", "bug"]):
+        state["classification"] = "incident"
+    elif any(word in title for word in ["user", "account", "profile"]):
+        state["classification"] = "user-data"
+    elif any(word in title for word in ["payment", "invoice", "billing"]):
+        state["classification"] = "finance"
+    else:
+        state["classification"] = "general"
+
+    return state
+
+
+def build_workflow():
     graph = StateGraph(WorkflowState)
-    graph.add_node("classify", classify_node)
     graph.add_node("summarize", summarize_node)
-    graph.set_entry_point("classify")
-    graph.add_edge("classify", "summarize")
-    graph.add_edge("summarize", END)
+    graph.add_node("count_words", count_words_node)
+    graph.add_node("classify", classify_node)
 
-    app = graph.compile()
-    result = app.invoke({"title": title, "body": body, "category": "", "summary": ""})
+    graph.set_entry_point("summarize")
+    graph.add_edge("summarize", "count_words")
+    graph.add_edge("count_words", "classify")
+    graph.add_edge("classify", END)
+    return graph.compile()
 
-    return {
+
+workflow_app = build_workflow()
+
+
+def run_workflow(title: str) -> WorkflowState:
+    initial_state: WorkflowState = {
         "title": title,
-        "category": result["category"],
-        "summary": result["summary"],
+        "summary": "",
+        "word_count": 0,
+        "classification": "",
     }
+    return workflow_app.invoke(initial_state)

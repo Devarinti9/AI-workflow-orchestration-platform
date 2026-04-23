@@ -1,8 +1,19 @@
 import json
+from typing import Any
+
 from sqlalchemy.orm import Session
+
 from app.models.workflow import WorkflowRecord
 
-def save_record(db: Session, source_name: str, title: str, raw_payload: dict, processed_output: dict | None = None, status: str = "stored"):
+
+def save_record(
+    db: Session,
+    source_name: str,
+    title: str,
+    raw_payload: dict[str, Any],
+    processed_output: dict[str, Any] | None = None,
+    status: str = "processed",
+) -> WorkflowRecord:
     record = WorkflowRecord(
         source_name=source_name,
         title=title,
@@ -15,5 +26,6 @@ def save_record(db: Session, source_name: str, title: str, raw_payload: dict, pr
     db.refresh(record)
     return record
 
-def get_records(db: Session):
+
+def get_records(db: Session) -> list[WorkflowRecord]:
     return db.query(WorkflowRecord).order_by(WorkflowRecord.id.desc()).all()
